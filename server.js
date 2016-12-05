@@ -43,8 +43,10 @@ server.route([
 			return reply(null, 'success!');				// return 'success!' with code 200
 			return reply('success!');					// return 'success!' with code 200
 */
-			},
+			}//,
+/* Example for browser-cache control
 		cache: { expiresIn: 3600000 }	// in milliseconds
+*/
 	}
 },
 {	
@@ -91,4 +93,38 @@ server.register(Blipp, (err) => {
 /path/{segment1?}/something			// Optional segment1 (denoted by ?)
 /path/{segment*}					// can provide any number of segment from 0 upward (anything will match this route)
 /path/{segment*2}					// can provide until 2 segment
+*/
+
+/* Example to extend interfaces in hapi like server and reply, but should easier to use plugin
+
+## Create new custom reply method called hello, which can be called in handler
+const hello = function (name) {
+	return this.response({hello: name});
+}
+server.decorate('reply','hello',hello);
+server.route({
+	method: 'GET',
+	path: '/{name}',
+	handler: function(request,reply) {
+		return reply.hello(request.params.name);
+	}
+});
+
+## Pass different config object on server.handler()
+server.handler('hello', (route, options) => 
+	{
+		return function(request,reply) {
+			const hello = options.customHello || 'Hello';
+			const name = request.params.name;
+			return reply(`${hello} ${name}`);
+		}
+	});
+server.route({
+	method: 'GET',
+	path: '/{name}',
+	handler: {
+		hello: {customHello: 'Welcome'}
+		}
+});
+
 */
